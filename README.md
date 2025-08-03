@@ -2,7 +2,10 @@
 
 A web-based application for in-depth analysis of YouTube playlists. It provides detailed statistics, insightful visualizations, and AI-generated insights using the **Google Gemini API**, helping users understand and plan their viewing experience before watching.
 
-🔗 **Live Demo:** **
+🔗 **Live Demo:** *https://nikhilagarwal03.github.io/Youtube-playlist-Analyzer/*
+
+---
+<img width="1800" height="950" alt="image" src="https://github.com/user-attachments/assets/38592f21-6e59-46b9-b52e-432b750cdab9" />
 
 ---
 
