@@ -1,0 +1,99 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f9;
+}
+
+.header-banner {
+    background-color: #34495e;
+    /* Deep Indigo */
+    color: white;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    border-color: #a5b4fc;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    /* Brighter Blue */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.loader {
+    border-top-color: #3b82f6;
+    animation: spin 1s linear infinite;
+}
+
+.ai-loader {
+    border-top-color: #3b82f6;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ai-output {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+}
+
+.ai-output h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+
+.ai-output ul {
+    list-style-type: none;
+    padding-left: 0.5rem;
+}
+
+.ai-output li {
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.ai-output li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #3b82f6;
+    font-weight: bold;
+}
+
+.ai-output strong {
+    /* For FAQ Questions */
+    color: #1e3a8a;
+}
+
+#videoList tr:hover {
+    background-color: #f9fafb;
+}

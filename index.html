@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Playlist Analyzer with AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header Banner -->
+    <header class="header-banner py-12 mb-12">
+        <div class="container mx-auto text-center px-4">
+            <h1 class="text-5xl font-extrabold">Playlist Analyzer</h1>
+            <p class="mt-3 text-lg text-gray-300 max-w-2xl mx-auto">Unlock insights from any YouTube playlist. Get total
+                watch time, video stats, and AI-powered summaries in seconds.</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-5xl -mt-24">
+
+        <!-- Input Section -->
+        <div class="card mb-8 p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-start">
+                <div>
+                    <label for="playlistUrl" class="block text-sm font-medium text-gray-700 mb-2">Playlist URL</label>
+                    <input type="text" id="playlistUrl" placeholder="https://www.youtube.com/playlist?list=..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
+                </div>
+                <div>
+                    <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-2">Google Cloud API
+                        Key</label>
+                    <input type="password" id="apiKey" placeholder="Enter your Google Cloud API Key"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
+                    <p class="text-xs text-gray-500 mt-1">Your key needs access to "YouTube Data API v3" and "Generative
+                        Language API". <a href="https://console.cloud.google.com/apis/credentials" target="_blank"
+                            class="text-blue-600 hover:underline">Get an API Key</a></p>
+                </div>
+            </div>
+            <div
+                class="mt-6 border-t border-gray-200 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 flex-wrap">
+                <button id="analyzeBtn"
+                    class="btn-primary font-semibold px-8 py-3 rounded-md shadow-sm transform hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto order-1 sm:order-1">
+                    <i class="fas fa-chart-line mr-2"></i>Analyze Playlist
+                </button>
+                <div class="flex space-x-2 order-2 sm:order-2">
+                    <button id="clearUrlBtn"
+                        class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 text-xs rounded-md hover:bg-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+                        Clear URL
+                    </button>
+                    <button id="clearKeyBtn"
+                        class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 text-xs rounded-md hover:bg-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+                        Clear Key
+                    </button>
+                    <button id="clearAllBtn"
+                        class="btn-danger font-semibold px-4 py-2 text-xs rounded-md hover:bg-red-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400">
+                        <i class="fas fa-times mr-1"></i>Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loader and Messages -->
+        <div id="loader" class="text-center my-8 hidden">
+            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24 mx-auto"></div>
+            <p class="mt-4 text-gray-600 font-medium">Fetching playlist data... This might take a moment.</p>
+        </div>
+        <div id="messageBox" class="text-center my-6 p-4 rounded-md hidden"></div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden space-y-8">
+            <!-- Summary Stats -->
+            <div id="summaryStats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Key Video Insights -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div id="longestVideo" class="card p-5"></div>
+                <div id="shortestVideo" class="card p-5"></div>
+                <div id="mostPopularVideo" class="card p-5"></div>
+                <div id="mostLikedVideo" class="card p-5"></div>
+            </div>
+
+            <!-- Data Analysis -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Binge Watch Calculator -->
+                <div class="card p-5">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i
+                            class="fas fa-calculator mr-3 text-blue-500"></i>Binge-Watch Schedule</h3>
+                    <p class="text-sm text-gray-600 mb-4">Calculate how long it will take to finish this playlist based
+                        on your schedule.</p>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <input type="number" id="watchHours" class="w-20 px-3 py-1.5 border border-gray-300 rounded-md"
+                            placeholder="Hours" min="0">
+                        <span class="text-gray-600">hr</span>
+                        <input type="number" id="watchMinutes"
+                            class="w-20 px-3 py-1.5 border border-gray-300 rounded-md" placeholder="Mins" min="0"
+                            max="59">
+                        <span class="text-gray-600">min / day</span>
+                    </div>
+                    <button id="calculateBingeBtn"
+                        class="btn-primary text-sm font-semibold px-5 py-2 rounded-md shadow-sm">Calculate</button>
+                    <div id="bingeResult"
+                        class="mt-4 text-center bg-blue-50 p-3 rounded-md text-blue-800 font-semibold hidden"></div>
+                </div>
+                <!-- Video Length Distribution -->
+                <div class="card p-5">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i
+                            class="fas fa-chart-bar mr-3 text-blue-500"></i>Video Length Distribution</h3>
+                    <canvas id="lengthDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- AI Powered Insights -->
+            <div class="card p-5 bg-blue-50 border-blue-200">
+                <div class="flex items-center text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-wand-magic-sparkles mr-3 text-blue-500 text-2xl"></i>
+                    <h3 class="text-2xl font-bold text-gray-800">AI-Powered Insights</h3>
+                </div>
+
+                <!-- AI Summary Section -->
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-700">Playlist Summary</h4>
+                    <p class="text-gray-600 mb-4 text-sm">Get a quick summary of the playlist's content, audience, and
+                        key topics.</p>
+                    <button id="generateSummaryBtn"
+                        class="btn-primary text-sm font-semibold px-5 py-2 rounded-md shadow-sm transform hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        ✨ Generate Summary
+                    </button>
+                    <div id="summaryLoader" class="text-center my-4 hidden">
+                        <div
+                            class="loader ai-loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mx-auto">
+                        </div>
+                        <p class="mt-2 text-gray-600 font-medium">✨ The AI is summarizing...</p>
+                    </div>
+                    <div id="aiSummaryOutput" class="ai-output mt-4 p-4 rounded-md hidden"></div>
+                </div>
+
+                <hr class="my-6 border-gray-200">
+
+                <!-- AI Learning Path Section -->
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-700">Learning Path Suggester</h4>
+                    <p class="text-gray-600 mb-4 text-sm">Let the AI organize the videos into a structured learning path
+                        for you.</p>
+                    <button id="generateLearningPathBtn"
+                        class="btn-primary text-sm font-semibold px-5 py-2 rounded-md shadow-sm transform hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        ✨ Suggest Learning Path
+                    </button>
+                    <div id="learningPathLoader" class="text-center my-4 hidden">
+                        <div
+                            class="loader ai-loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mx-auto">
+                        </div>
+                        <p class="mt-2 text-gray-600 font-medium">✨ The AI is designing your path...</p>
+                    </div>
+                    <div id="aiLearningPathOutput" class="ai-output mt-4 p-4 rounded-md hidden"></div>
+                </div>
+
+                <hr class="my-6 border-gray-200">
+
+                <!-- AI FAQ Generator Section -->
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-700">FAQ Generator</h4>
+                    <p class="text-gray-600 mb-4 text-sm">Anticipate common questions a viewer might have about the
+                        playlist's content.</p>
+                    <button id="generateFaqBtn"
+                        class="btn-primary text-sm font-semibold px-5 py-2 rounded-md shadow-sm transform hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        ✨ Generate FAQs
+                    </button>
+                    <div id="faqLoader" class="text-center my-4 hidden">
+                        <div
+                            class="loader ai-loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mx-auto">
+                        </div>
+                        <p class="mt-2 text-gray-600 font-medium">✨ The AI is generating questions...</p>
+                    </div>
+                    <div id="aiFaqOutput" class="ai-output mt-4 p-4 rounded-md hidden"></div>
+                </div>
+            </div>
+
+            <!-- Video List -->
+            <div class="card p-5">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Playlist Videos</h3>
+                <div class="overflow-x-auto rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    #</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Video Title</th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="videoList" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
