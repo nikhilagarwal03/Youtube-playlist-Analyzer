@@ -75,11 +75,12 @@ Your API key is as sensitive as a password. If exposed, it can lead to **unautho
 
 ## 📂 Project File Structure
 
+```
 📁 project-root/
-├── index.html # Main layout and markup
-├── style.css # Tailwind CSS and custom styles
-└── script.js # Logic, API calls, DOM manipulation
-
+├── index.html     # Main layout and markup
+├── style.css      # Tailwind CSS and custom styles
+└── script.js      # Logic, API calls, DOM manipulation
+```
 
 ---
 
